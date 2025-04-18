@@ -1,0 +1,77 @@
+name: Publish NuGet Package
+
+on:
+  push:
+    branches:
+      - main # Executa o pipeline ao fazer push na branch "main"
+  pull_request:
+    branches:
+      - main # Executa o pipeline em Pull Requests para a branch "main"
+
+env:
+  DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1 # Define a variável de ambiente para o sistema de globalização do .NET
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions: 
+      packages: write
+      contents: read
+      
+    steps:
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y curl wget ca-certificates
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install .NET 9
+      run: |
+        wget https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh --no-check-certificate
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh --channel 9.0 --install-dir $HOME/.dotnet
+        echo "$HOME/.dotnet" >> $GITHUB_PATH
+
+    - name: Print .NET Info
+      run: dotnet --info
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Run Unit Tests
+      run: dotnet test --verbosity detailed
+
+    - name: Build project
+      run: dotnet build --configuration Release
+
+    - name: Pack NuGet package
+      run: dotnet pack --configuration Release --output ./nupkg
+
+    - name: Publish to GitHub Packages
+      if: github.ref == 'refs/heads/main' # Publica apenas na branch "main"
+      run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/AndersonCosta28/index.json" --api-key ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Clean up artifacts
+      if: always()
+      run: rm -rf ./nupkg
+
+
+  # Job para testar localmente
+  local-test:
+    if: github.event_name == 'workflow_dispatch' # Executa apenas se for disparado manualmente
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Run Unit Tests
+      run: dotnet test --no-build --verbosity normal
