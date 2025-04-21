@@ -1,9 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>MyValidator</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>Anderson Costa</Authors>
+    <Owners>Anderson Costa</Owners>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/AndersonCosta28/MyValidator</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/AndersonCosta28/MyValidator/main/icon.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>A flexible and extensible validation library for .NET projects.</Description>
+    <PackageReleaseNotes>Initial release with core validation features.</PackageReleaseNotes>
+    <PackageTags>validation .NET library</PackageTags>
   </PropertyGroup>
-
 </Project>
