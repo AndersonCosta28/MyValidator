@@ -9,7 +9,7 @@ public abstract class ValidatorBuilder<T> : INestedValidator
     protected CollectionRuleBuilder<T, TItem> RulesFor<TItem>(Expression<Func<T, IEnumerable<TItem>>> selector) =>
         new(selector, this._rules);
 
-    public List<ValidationResult> ValidateWithResult(object instance) => this.Validate((T)instance);
+    List<ValidationResult> INestedValidator.Validate(object instance) => this.Validate((T)instance);
 
     public List<ValidationResult> Validate(T instance)
     {

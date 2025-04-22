@@ -4,6 +4,7 @@ public class RuleBuilder<TInstance, TProperty>
 {
     private readonly Expression<Func<TInstance, TProperty>> _propertySelector;
     private readonly List<IValidationRule<TInstance>> _rules;
+    private readonly List<IValidationRule<TInstance>> _internalRules = [];
     private ValidationRule<TInstance, TProperty> _currentRule;
 
     internal RuleBuilder(Expression<Func<TInstance, TProperty>> propertySelector, List<IValidationRule<TInstance>> rules)
@@ -16,6 +17,7 @@ public class RuleBuilder<TInstance, TProperty>
     {
         this._currentRule = new(this._propertySelector, condition);
         this._rules.Add(this._currentRule);
+        this._internalRules.Add(this._currentRule);
         return this;
     }
 
@@ -23,37 +25,58 @@ public class RuleBuilder<TInstance, TProperty>
     {
         this._currentRule = new(this._propertySelector, condition);
         this._rules.Add(this._currentRule);
+        this._internalRules.Add(this._currentRule);
         return this;
     }
 
     public RuleBuilder<TInstance, TProperty> Message(string message)
     {
-        if (this._currentRule != null)
-            this._currentRule.ErrorMessageFunc = (_, _) => message;
+        foreach (var rule in this._internalRules)
+            if (rule is ValidationRule<TInstance, TProperty> { ErrorMessageFunc: null } validationRule)
+            {
+                if (validationRule.ErrorMessageFunc != null)
+                    break;
+                validationRule.ErrorMessageFunc = (_, _) => message;
+            }
 
         return this;
     }
 
     public RuleBuilder<TInstance, TProperty> Message(Expression<Func<TProperty, TInstance, string>> func)
     {
-        if (this._currentRule != null)
-            this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance);
+        foreach (var rule in this._internalRules.AsEnumerable().Reverse())
+            if (rule is ValidationRule<TInstance, TProperty> { ErrorMessageFunc: null } validationRule)
+            {
+                if (validationRule.ErrorMessageFunc != null)
+                    break;
+                validationRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance);
+            }
 
         return this;
     }
 
     public RuleBuilder<TInstance, TProperty> Message(Expression<Func<TProperty, string>> func)
     {
-        if (this._currentRule != null)
-            this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property);
+        foreach (var rule in this._internalRules)
+            if (rule is ValidationRule<TInstance, TProperty> validationRule)
+            {
+                if (validationRule.ErrorMessageFunc != null)
+                    break;
+                validationRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property);
+            }
 
         return this;
     }
 
     public RuleBuilder<TInstance, TProperty> Message(Expression<Func<string>> func)
     {
-        if (this._currentRule != null)
-            this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke();
+        foreach (var rule in this._internalRules)
+            if (rule is ValidationRule<TInstance, TProperty> validationRule)
+            {
+                if (validationRule.ErrorMessageFunc != null)
+                    break;
+                validationRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke();
+            }
 
         return this;
     }

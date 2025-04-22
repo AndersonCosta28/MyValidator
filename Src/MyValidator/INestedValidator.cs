@@ -1,5 +1,5 @@
 ﻿namespace MyValidator;
 internal interface INestedValidator
 {
-    List<ValidationResult> ValidateWithResult(object instance);
+    internal List<ValidationResult> Validate(object instance);
 }

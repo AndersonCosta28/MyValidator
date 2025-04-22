@@ -2,10 +2,10 @@
 
 internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TInstance>
 {
-    public Func<TInstance, TProperty> PropertySelector { get; }
-    public Func<TProperty, TInstance, bool> Condition { get; }
-    public Func<TProperty, TInstance, string> ErrorMessageFunc { get; set; }
-    public INestedValidator NestedValidator { get; set; }
+    public Func<TInstance, TProperty> PropertySelector { get; } = default!;
+    public Func<TProperty, TInstance, bool> Condition { get; } = default!;
+    public Func<TProperty, TInstance, string> ErrorMessageFunc { get; set; } = default!;
+    public INestedValidator NestedValidator { get; set; } = default!;
 
     public string PathName { get; set; }
 
@@ -66,15 +66,15 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             var i = 0;
             foreach (var item in list)
             {
-                var nestedResult = this.NestedValidator.ValidateWithResult(item);
-                result.Merge($"{this.PathName}[{i}]", nestedResult);
+                var nestedResult = this.NestedValidator.Validate(item);
+                result.Merge(this.PathName, $"{this.PathName}[{i}]", nestedResult);
                 i++;
             }
         }
         else
         {
-            var nestedResult = this.NestedValidator.ValidateWithResult(value);
-            result.Merge(this.PathName, nestedResult);
+            var nestedResult = this.NestedValidator.Validate(value);
+            result.Merge(this.PathName, this.PathName, nestedResult);
         }
     }
 
