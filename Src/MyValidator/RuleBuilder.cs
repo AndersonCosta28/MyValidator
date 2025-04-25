@@ -29,6 +29,22 @@ public class RuleBuilder<TInstance, TProperty>
         return this;
     }
 
+    internal RuleBuilder<TInstance, TProperty> Must(Expression<Func<TProperty, bool>> condition, Expression<Func<TProperty, TInstance, string>> func)
+    {
+        this._currentRule = new(this._propertySelector, condition);
+        this._rules.Add(this._currentRule);
+        this._internalRules.Add(this._currentRule);
+        return this;
+    }
+
+    internal RuleBuilder<TInstance, TProperty> Must(Expression<Func<TProperty, TInstance, bool>> condition, Expression<Func<TProperty, TInstance, string>> func)
+    {
+        this._currentRule = new(this._propertySelector, condition);
+        this._rules.Add(this._currentRule);
+        this._internalRules.Add(this._currentRule);
+        return this;
+    }
+
     public RuleBuilder<TInstance, TProperty> Message(string message)
     {
         foreach (var rule in this._internalRules)
@@ -38,7 +54,7 @@ public class RuleBuilder<TInstance, TProperty>
                     break;
                 validationRule.ErrorMessageFunc = (_, _) => message;
             }
-
+        this._currentRule.ErrorMessageFunc = (_, _) => message;
         return this;
     }
 
@@ -51,7 +67,7 @@ public class RuleBuilder<TInstance, TProperty>
                     break;
                 validationRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance);
             }
-
+        this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance);
         return this;
     }
 
@@ -64,7 +80,7 @@ public class RuleBuilder<TInstance, TProperty>
                     break;
                 validationRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property);
             }
-
+        this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property);
         return this;
     }
 
@@ -77,7 +93,7 @@ public class RuleBuilder<TInstance, TProperty>
                     break;
                 validationRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke();
             }
-
+        this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke();
         return this;
     }
 
