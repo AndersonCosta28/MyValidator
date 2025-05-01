@@ -6,16 +6,16 @@ public class ValidationException : Exception
 
     public ValidationException(List<ValidationError> validationErrors)
     {
-        ValidationErrors = validationErrors;
+        this.ValidationErrors = validationErrors;
     }
 
     public ValidationException(List<ValidationError> validationErrors, string message) : base(message)
     {
-        ValidationErrors = validationErrors;
+        this.ValidationErrors = validationErrors;
     }
 
     public ValidationException(List<ValidationError> validationErrors, string message, Exception innerException) : base(message, innerException)
     {
-        ValidationErrors = validationErrors;
+        this.ValidationErrors = validationErrors;
     }
 }
