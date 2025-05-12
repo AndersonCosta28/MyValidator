@@ -7,12 +7,18 @@ public class MyEditFormValidator : ComponentBase
 {
     private ValidationMessageStore? _messageStore;
 
-    [CascadingParameter] private EditContext? _currentEditContext { get; set; }
+    [CascadingParameter] private EditContext? _currentEditContext { get; set; } = default!;
+    [Parameter] public EditForm OtherEditForm { get; set; } = default!;
     [Inject] IServiceProvider _services { get; set; } = default!;
 
     protected override void OnInitialized()
     {
-        if (this._currentEditContext is null)
+        this.configureEditContext(OtherEditForm?.EditContext ?? _currentEditContext);
+    }
+
+    private void configureEditContext(EditContext editContext)
+    {
+        if (editContext is null)
         {
             throw new InvalidOperationException(
                 $"{nameof(MyEditFormValidator)} requires a cascading " +
@@ -21,13 +27,13 @@ public class MyEditFormValidator : ComponentBase
                 $"inside an {nameof(EditForm)}.");
         }
 
-        this._messageStore = new(this._currentEditContext);
+        this._messageStore = new(editContext);
 
-        this._currentEditContext.OnValidationRequested += (s, e) =>
+        editContext.OnValidationRequested += (s, e) =>
         {
-            var editContext = s as EditContext;
+            var currentEditContext = s as EditContext;
             this._messageStore?.Clear();
-            var model = editContext!.Model;
+            var model = currentEditContext!.Model;
             var type = typeof(ValidatorBuilder<>).MakeGenericType(model.GetType());
             var validator = this._services.GetRequiredService(type);
             var validateMethod = validator.GetType().GetMethod("Validate");
@@ -35,38 +41,17 @@ public class MyEditFormValidator : ComponentBase
 
             foreach (var result in results ?? [])
             {
-                List<string> errorsMessage = [];
                 foreach (var error in result.Errors)
                 {
-                    var field = editContext.Field(error.Path);
+                    var field = currentEditContext.Field(error.Path);
                     this._messageStore!.Add(field, error.Message);
                 }
             }
 
-            editContext.NotifyValidationStateChanged();
+            currentEditContext.NotifyValidationStateChanged();
         };
 
-
-        this._currentEditContext.OnFieldChanged += (s, e) =>
+        editContext.OnFieldChanged += (s, e) =>
             this._messageStore?.Clear(e.FieldIdentifier);
-    }
-
-    public void DisplayErrors(Dictionary<string, List<string>> errors)
-    {
-        if (this._currentEditContext is not null)
-        {
-            foreach (var err in errors)
-            {
-                this._messageStore?.Add(this._currentEditContext.Field(err.Key), err.Value);
-            }
-
-            this._currentEditContext.NotifyValidationStateChanged();
-        }
-    }
-
-    public void ClearErrors()
-    {
-        this._messageStore?.Clear();
-        this._currentEditContext?.NotifyValidationStateChanged();
     }
 }
