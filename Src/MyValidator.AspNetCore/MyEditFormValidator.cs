@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.Extensions.DependencyInjection;
 namespace MyValidator.AspNetCore;
 
 public class MyEditFormValidator : ComponentBase
@@ -35,7 +34,9 @@ public class MyEditFormValidator : ComponentBase
             this._messageStore?.Clear();
             var model = currentEditContext!.Model;
             var type = typeof(ValidatorBuilder<>).MakeGenericType(model.GetType());
-            var validator = this._services.GetRequiredService(type);
+            var validator = this._services.GetService(type);
+            if (validator == null)
+                return;
             var validateMethod = validator.GetType().GetMethod("Validate");
             var results = validateMethod?.Invoke(validator, new object[] { model }) as List<ValidationResult>;
 
