@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>MyValidator</id>
+    <version>1.0.2</version>
+    <authors>Anderson Costa</authors>
+    <owners>Anderson Costa</owners>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/AndersonCosta28/MyValidator</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/AndersonCosta28/MyValidator/main/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A flexible and extensible validation library for .NET projects.</description>
+    <releaseNotes>Initial release with core validation features.</releaseNotes>
+    <tags>validation .NET library</tags>
+  </metadata>
+  <files>
+    <file src="bin\**\*.dll" target="lib\net9.0" />
+  </files>
+</package>
