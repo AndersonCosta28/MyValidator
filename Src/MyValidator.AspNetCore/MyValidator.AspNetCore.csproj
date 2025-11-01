@@ -4,6 +4,21 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- Metadados NuGet migrados do .nuspec para o .csproj -->
+    <Version>1.0.2</Version>
+    <PackageId>MyValidator.AspNetCore</PackageId>
+    <Authors>Anderson Costa</Authors>
+    <Owners>Anderson Costa</Owners>
+    <Description>ASP.NET Core integrations and components for MyValidator.</Description>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/AndersonCosta28/MyValidator</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/AndersonCosta28/MyValidator/main/icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/AndersonCosta28/MyValidator</RepositoryUrl>
+    <PackageTags>validation .NET library aspnetcore</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- O ProjectReference abaixo lida com a dependência do NuGet automaticamente. -->
   </PropertyGroup>
 
   <ItemGroup>
