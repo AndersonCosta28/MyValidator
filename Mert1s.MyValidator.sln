@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E7191AA9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "Tests\UnitTests\UnitTests.csproj", "{A0E6C5C7-ED78-42BC-BFA3-08783FEBB527}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mert1s.MyValidator.AspNetCore", "Src\MyValidator.AspNetCore\Mert1s.MyValidator.AspNetCore.csproj", "{7295B3F2-D13A-4B1B-5171-362EFB7EBB26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mert1s.MyValidator.Components", "Src\MyValidator.AspNetCore\Mert1s.MyValidator.Components.csproj", "{7295B3F2-D13A-4B1B-5171-362EFB7EBB26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{380A7511-A354-6D7A-0CC0-8FA1F1BA7B6C}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens
 		.github\workflows\nuget-publish.yml = .github\workflows\nuget-publish.yml
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mert1s.MyValidator.DependencyInjection", "Mert1s.MyValidator.DependencyInjection\Mert1s.MyValidator.DependencyInjection.csproj", "{55DBA596-1F47-4305-86C7-C4FE3539A87B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,18 @@ Global
 		{7295B3F2-D13A-4B1B-5171-362EFB7EBB26}.Release|x64.Build.0 = Release|Any CPU
 		{7295B3F2-D13A-4B1B-5171-362EFB7EBB26}.Release|x86.ActiveCfg = Release|Any CPU
 		{7295B3F2-D13A-4B1B-5171-362EFB7EBB26}.Release|x86.Build.0 = Release|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Debug|x64.Build.0 = Debug|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Debug|x86.Build.0 = Debug|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Release|x64.ActiveCfg = Release|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Release|x64.Build.0 = Release|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Release|x86.ActiveCfg = Release|Any CPU
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +88,7 @@ Global
 		{E66E9089-0841-2E97-9F46-F7CDB5D1E47C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{A0E6C5C7-ED78-42BC-BFA3-08783FEBB527} = {E7191AA9-9D1D-4D79-ADF4-288ADFCAB068}
 		{7295B3F2-D13A-4B1B-5171-362EFB7EBB26} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{55DBA596-1F47-4305-86C7-C4FE3539A87B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A908D42E-8A87-448B-AFBD-9DF96DECA381}

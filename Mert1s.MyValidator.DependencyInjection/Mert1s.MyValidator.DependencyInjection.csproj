@@ -4,31 +4,24 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
-    <!-- Metadados NuGet migrados do .nuspec para o .csproj -->
     <Version>1.0.1</Version>
-    <PackageId>Mert1s.MyValidator.AspNetCore</PackageId>
+    <PackageId>Mert1s.MyValidator.DependencyInjection</PackageId>
     <Authors>Anderson Costa</Authors>
     <Owners>Anderson Costa</Owners>
-    <Description>ASP.NET Core integrations and components for MyValidator.</Description>
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/AndersonCosta28/MyValidator</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/AndersonCosta28/MyValidator/main/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/AndersonCosta28/MyValidator</RepositoryUrl>
     <PackageTags>validation .NET library aspnetcore</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-
-    <!-- O ProjectReference abaixo lida com a dependência do NuGet automaticamente. -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="9.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyValidator\Mert1s.MyValidator.csproj" />
+    <ProjectReference Include="..\Src\MyValidator\Mert1s.MyValidator.csproj" />
   </ItemGroup>
 
 </Project>
