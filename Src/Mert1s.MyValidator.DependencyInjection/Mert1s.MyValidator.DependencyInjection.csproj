@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Src\MyValidator\Mert1s.MyValidator.csproj" />
+    <ProjectReference Include="..\Mert1s.MyValidator\Mert1s.MyValidator.csproj" />
   </ItemGroup>
 
 </Project>

@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Mert1s.MyValidator.DependencyInjection\Mert1s.MyValidator.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Mert1s.MyValidator.DependencyInjection\Mert1s.MyValidator.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

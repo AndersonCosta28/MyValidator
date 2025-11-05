@@ -151,7 +151,7 @@ public class ValidatorIntegrationTests
     private class TestModelValidator : ValidatorBuilder<TestModel>
     {
         public TestModelValidator(Func<string, CancellationToken, Task<bool>> asyncCheck) => this.RuleFor(x => x.Email)
-        .MustAsync((Func<string, CancellationToken, Task<bool>>)((email, ct) => asyncCheck(email, ct)))
+        .MustAsync((email, ct) => asyncCheck(email, ct))
         .Message("Email already exists.");
     }
 
@@ -167,38 +167,32 @@ public class ValidatorIntegrationTests
 
     private class ChildValidator : ValidatorBuilder<ChildModel>
     {
-        public ChildValidator(Microsoft.Data.Sqlite.SqliteConnection conn)
-        {
-            this.RuleFor(x => x.Email)
-            .MustAsync((Func<string, CancellationToken, Task<bool>>)(async (email, ct) =>
+        public ChildValidator(Microsoft.Data.Sqlite.SqliteConnection conn) => this.RuleFor(x => x.Email)
+            .MustAsync(async (email, ct) =>
             {
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = "SELECT COUNT(1) FROM Users WHERE Email = $email";
                 cmd.Parameters.AddWithValue("$email", email);
                 var count = (long)await cmd.ExecuteScalarAsync(ct);
                 return count == 0;
-            }))
+            })
             .Message("Email already exists.");
-        }
     }
 
     private class DelayingChildValidator : ValidatorBuilder<ChildModel>
     {
         public DelayingChildValidator() => this.RuleFor(x => x.Email)
-        .MustAsync((Func<string, CancellationToken, Task<bool>>)(async (email, ct) =>
+        .MustAsync(async (email, ct) =>
         {
             await Task.Delay(1000, ct);
             return true;
-        }))
+        })
         .Message("Delayed check");
     }
 
     private class ParentValidator : ValidatorBuilder<ParentModel>
     {
-        public ParentValidator(ValidatorBuilder<ChildModel> childValidator)
-        {
-            this.RuleFor(x => x.Child)
+        public ParentValidator(ValidatorBuilder<ChildModel> childValidator) => this.RuleFor(x => x.Child)
             .SetValidatorAsync(childValidator);
-        }
     }
 }

@@ -1,5 +1,4 @@
 using Microsoft.Data.Sqlite;
-using System.Data;
 
 namespace UnitTests;
 
@@ -25,11 +24,12 @@ public class AsyncIntegrationTests
 
         var validator = new TestModelValidator(async (email, ct) =>
         {
+            // Query sqlite to see if email exists
             using var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT COUNT(1) FROM Users WHERE Email = $email";
             cmd.Parameters.AddWithValue("$email", email);
             var count = (long)await cmd.ExecuteScalarAsync(ct);
-            return count == 0;
+            return count == 0; // valid if not exists
         });
 
         // Act
@@ -44,13 +44,10 @@ public class AsyncIntegrationTests
         public string Email { get; set; } = string.Empty;
     }
 
-    private class TestModelValidator : Mert1s.MyValidator.ValidatorBuilder<TestModel>
+    private class TestModelValidator : ValidatorBuilder<TestModel>
     {
-        public TestModelValidator(Func<string, CancellationToken, Task<bool>> asyncCheck)
-        {
-            this.RuleFor(x => x.Email)
-                .MustAsync((Func<string, CancellationToken, Task<bool>>)((email, ct) => asyncCheck(email, ct)))
-                .Message("Email already exists.");
-        }
+        public TestModelValidator(Func<string, CancellationToken, Task<bool>> asyncCheck) => this.RuleFor(x => x.Email)
+            .MustAsync((email, ct) => asyncCheck(email, ct))
+            .Message("Email already exists.");
     }
 }
