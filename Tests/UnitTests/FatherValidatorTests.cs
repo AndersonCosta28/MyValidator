@@ -1,3 +1,4 @@
+namespace UnitTests;
 
 public class FatherValidatorTests
 {
@@ -11,11 +12,11 @@ public class FatherValidatorTests
             DateOfBirth = new DateTime(1980, 1, 1),
             Gender = Gender.Masculino,
             Wife = new Person { Name = "" }, // Invalid
-            Children = new List<Person>
-            {
-                new Person { Name = "João", DateOfBirth = DateTime.Today.AddYears(-10), Gender = Gender.Masculino },
-                new Person { Name = "Maria", DateOfBirth = DateTime.Today.AddDays(1), Gender = Gender.Feminino } // Invalid
-            }
+            Children =
+        [
+            new Person { Name = "João", DateOfBirth = DateTime.Today.AddYears(-10), Gender = Gender.Masculino },
+            new Person { Name = "Maria", DateOfBirth = DateTime.Today.AddDays(1), Gender = Gender.Feminino } // Invalid
+        ]
         };
 
         var validator = new FatherValidator();
@@ -37,11 +38,11 @@ public class FatherValidatorTests
             DateOfBirth = new DateTime(1980, 1, 1),
             Gender = Gender.Masculino,
             Wife = new Person { Name = "Ana" },
-            Children = new List<Person>
-            {
-                new Person { Name = "João", DateOfBirth = DateTime.Today.AddYears(-10), Gender = Gender.Masculino },
-                new Person { Name = "Maria", DateOfBirth = DateTime.Today.AddDays(1), Gender = Gender.Feminino } // Invalid
-            }
+            Children =
+        [
+            new Person { Name = "João", DateOfBirth = DateTime.Today.AddYears(-10), Gender = Gender.Masculino },
+            new Person { Name = "Maria", DateOfBirth = DateTime.Today.AddDays(1), Gender = Gender.Feminino } // Invalid
+        ]
         };
 
         var validator = new FatherValidator();
@@ -63,10 +64,10 @@ public class FatherValidatorTests
             DateOfBirth = new DateTime(1980, 1, 1),
             Gender = Gender.Masculino,
             Wife = new Person { Name = "Ana" },
-            Children = new List<Person>
-            {
-                new Person { Name = "João", DateOfBirth = DateTime.Today.AddYears(-10), Gender = Gender.Masculino } // Invalid
-            }
+            Children =
+        [
+            new Person { Name = "João", DateOfBirth = DateTime.Today.AddYears(-10), Gender = Gender.Masculino } // Invalid
+        ]
         };
 
         var validator = new FatherValidator();

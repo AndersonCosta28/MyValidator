@@ -10,9 +10,9 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     public string PathName { get; set; }
 
     public ValidationRule(
-        Expression<Func<TInstance, TProperty>> propertySelector,
-        Expression<Func<TProperty, TInstance, bool>> condition
-        )
+    Expression<Func<TInstance, TProperty>> propertySelector,
+    Expression<Func<TProperty, TInstance, bool>> condition
+    )
     {
         this.PathName = GetPropertyName(propertySelector);
         this.PropertySelector = propertySelector.Compile();
@@ -20,8 +20,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     }
 
     public ValidationRule(
-        Expression<Func<TInstance, TProperty>> propertySelector,
-        Expression<Func<TProperty, bool>> condition
+    Expression<Func<TInstance, TProperty>> propertySelector,
+    Expression<Func<TProperty, bool>> condition
     )
     {
         this.PathName = GetPropertyName(propertySelector);
@@ -34,7 +34,7 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     public ValidationRule(
     Expression<Func<TInstance, TProperty>> propertySelector,
     INestedValidator nestedValidator
-) : this(propertySelector, (_, _) => true) =>
+   ) : this(propertySelector, (_, _) => true) =>
     this.NestedValidator = nestedValidator;
 
     public string GetErrorMessage(TInstance instance)
@@ -62,6 +62,21 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         return result;
     }
 
+    public async Task<ValidationResult> ValidateAsync(TInstance instance, CancellationToken cancellation = default)
+    {
+        var result = new ValidationResult();
+
+        var value = this.PropertySelector(instance);
+
+        if (!this.Condition(value, instance))
+            result.AddError(this.PathName, this.GetErrorMessage(instance));
+
+        if (this.NestedValidator != null && value != null)
+            await this.ValidateNestedAsync(value, result, cancellation).ConfigureAwait(false);
+
+        return result;
+    }
+
     private void ValidateNested(object value, ValidationResult result)
     {
         if (value is IEnumerable<object> list)
@@ -77,6 +92,25 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         else
         {
             var nestedResult = this.NestedValidator.Validate(value);
+            result.Merge(this.PathName, this.PathName, nestedResult);
+        }
+    }
+
+    private async Task ValidateNestedAsync(object value, ValidationResult result, CancellationToken cancellation)
+    {
+        if (value is IEnumerable<object> list)
+        {
+            var i = 0;
+            foreach (var item in list)
+            {
+                var nestedResults = await this.NestedValidator.ValidateAsync(item, cancellation).ConfigureAwait(false);
+                result.Merge(this.PathName, $"{this.PathName}[{i}]", nestedResults);
+                i++;
+            }
+        }
+        else
+        {
+            var nestedResult = await this.NestedValidator.ValidateAsync(value, cancellation).ConfigureAwait(false);
             result.Merge(this.PathName, this.PathName, nestedResult);
         }
     }
