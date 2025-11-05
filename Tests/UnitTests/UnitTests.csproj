@@ -15,6 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Src\MyValidator\MyValidator.csproj" />
+    <ProjectReference Include="..\..\Src\MyValidator\Mert1s.MyValidator.csproj" />
   </ItemGroup>
 </Project>

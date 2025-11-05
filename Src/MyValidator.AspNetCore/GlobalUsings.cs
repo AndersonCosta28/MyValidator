@@ -1,1 +1,1 @@
-﻿namespace MyValidator.AspNetCore;
+﻿namespace Mert1s.MyValidator.AspNetCore;

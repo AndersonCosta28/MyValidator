@@ -1,3 +1,5 @@
+using Mert1s.MyValidator;
+
 internal class WifeValidator : ValidatorBuilder<Person>
 {
     public WifeValidator() =>

@@ -1,4 +1,4 @@
-﻿namespace MyValidator;
+﻿namespace Mert1s.MyValidator;
 /// <summary>
 /// Extensões para validar valores de enum dentro de RuleBuilder.
 /// </summary>

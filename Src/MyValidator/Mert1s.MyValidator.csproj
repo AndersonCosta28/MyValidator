@@ -4,8 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <Version>1.0.2</Version>
-    <PackageId>MyValidator</PackageId>
+    <Version>1.0.1</Version>
+    <PackageId>Mert1s.MyValidator</PackageId>
     <Authors>Anderson Costa</Authors>
     <Owners>Anderson Costa</Owners>
     <Description>A flexible and extensible validation library for .NET projects.</Description>

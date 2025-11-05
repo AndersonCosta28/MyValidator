@@ -1,4 +1,6 @@
-﻿internal class FatherValidator : ValidatorBuilder<Father>
+﻿using Mert1s.MyValidator;
+
+internal class FatherValidator : ValidatorBuilder<Father>
 {
     public FatherValidator()
     {

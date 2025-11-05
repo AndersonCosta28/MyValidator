@@ -1,4 +1,4 @@
-namespace MyValidator;
+namespace Mert1s.MyValidator;
 
 public class ValidationException : Exception
 {

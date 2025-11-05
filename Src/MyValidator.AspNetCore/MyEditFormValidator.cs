@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Mert1s.MyValidator;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-namespace MyValidator.AspNetCore;
+namespace Mert1s.MyValidator.AspNetCore;
 
 public class MyEditFormValidator : ComponentBase
 {
@@ -18,13 +19,11 @@ public class MyEditFormValidator : ComponentBase
     private void configureEditContext(EditContext editContext)
     {
         if (editContext is null)
-        {
             throw new InvalidOperationException(
                 $"{nameof(MyEditFormValidator)} requires a cascading " +
                 $"parameter of type {nameof(EditContext)}. " +
                 $"For example, you can use {nameof(MyEditFormValidator)} " +
                 $"inside an {nameof(EditForm)}.");
-        }
 
         this._messageStore = new(editContext);
 
@@ -41,13 +40,11 @@ public class MyEditFormValidator : ComponentBase
             var results = validateMethod?.Invoke(validator, new object[] { model }) as List<ValidationResult>;
 
             foreach (var result in results ?? [])
-            {
                 foreach (var error in result.Errors)
                 {
                     var field = currentEditContext.Field(error.Path);
                     this._messageStore!.Add(field, error.Message);
                 }
-            }
 
             currentEditContext.NotifyValidationStateChanged();
         };

@@ -1,4 +1,4 @@
-﻿namespace MyValidator;
+﻿namespace Mert1s.MyValidator;
 /// <summary>
 /// Extensões para validar strings dentro de RuleBuilder.
 /// </summary>
@@ -13,6 +13,13 @@ public static class RuleBuilderStringExtensions
     /// Garante que a string não seja nula, vazia ou composta apenas por espaços em branco.
     /// </summary>
     public static RuleBuilder<TInstance, string> NotNullOrWhiteSpace<TInstance>(this RuleBuilder<TInstance, string> builder) => builder.Must(x => !string.IsNullOrWhiteSpace(x), (x, _) => $"{x} is null or whitespace");
+
+    /// <summary>
+    /// Garante que a string tenha exatamente o tamanho especificado.
+    /// </summary>
+    /// <param name="length">Comprimento exato esperado.</param>
+    public static RuleBuilder<TInstance, string> Length<TInstance>(this RuleBuilder<TInstance, string> builder, int length)
+        => builder.Must(x => x.Length == length, (x, _) => $"{x} must have length {length}");
 
     /// <summary>
     /// Garante que a string tenha um tamanho mínimo especificado.

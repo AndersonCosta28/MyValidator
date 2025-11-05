@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Mert1s.MyValidator;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace MyValidator.AspNetCore.Extensions.DependencyInjection;
+namespace Mert1s.MyValidator.AspNetCore.Extensions.DependencyInjection;
 public static class AddMyValidatorExtesions
 {
     public static IServiceCollection AddMyValidator(

@@ -1,4 +1,4 @@
-﻿namespace MyValidator;
+﻿namespace Mert1s.MyValidator;
 public abstract class ValidatorBuilder<T> : INestedValidator
 {
     private readonly List<IValidationRule<T>> _rules = [];

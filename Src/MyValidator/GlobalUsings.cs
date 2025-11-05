@@ -1,3 +1,3 @@
 global using System.Linq.Expressions;
 
-namespace MyValidator;
+namespace Mert1s.MyValidator;

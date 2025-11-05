@@ -1,4 +1,4 @@
-﻿namespace MyValidator;
+﻿namespace Mert1s.MyValidator;
 
 internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TInstance>
 {
