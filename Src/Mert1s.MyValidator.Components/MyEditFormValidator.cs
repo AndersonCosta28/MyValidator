@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-namespace Mert1s.MyValidator.AspNetCore;
+namespace Mert1s.MyValidator.Components;
 
 public class MyEditFormValidator : ComponentBase
 {
