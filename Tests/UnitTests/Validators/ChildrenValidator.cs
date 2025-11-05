@@ -1,5 +1,3 @@
-using Mert1s.MyValidator;
-
 internal class ChildrenValidator : ValidatorBuilder<Person>
 {
     public ChildrenValidator() =>

@@ -9,13 +9,13 @@ public static class RuleBuilderIntExtensions
     /// Garante que o valor seja maior que um número especificado.
     /// </summary>
     /// <param name="value">Valor mínimo esperado.</param>
-    public static RuleBuilder<TInstance, int> GreaterThan<TInstance>(this RuleBuilder<TInstance, int> builder, int value) => builder.Must((x) => x > value, (x, _) => $"{x} is not great than {value}");
+    public static RuleBuilder<TInstance, int> GreaterThan<TInstance>(this RuleBuilder<TInstance, int> builder, int value) => builder.Must((x) => x > value, (x, _) => $"{x} is not greater than {value}");
 
     /// <summary>
     /// Garante que o valor seja maior ou igual a um número especificado.
     /// </summary>
     /// <param name="value">Valor mínimo permitido.</param>
-    public static RuleBuilder<TInstance, int> GreaterThanOrEqual<TInstance>(this RuleBuilder<TInstance, int> builder, int value) => builder.Must(x => x >= value, (x, _) => $"{x} is not great than or equal {value}");
+    public static RuleBuilder<TInstance, int> GreaterThanOrEqual<TInstance>(this RuleBuilder<TInstance, int> builder, int value) => builder.Must(x => x >= value, (x, _) => $"{x} is not greater than or equal to {value}");
 
     /// <summary>
     /// Garante que o valor seja menor que um número especificado.
@@ -27,7 +27,7 @@ public static class RuleBuilderIntExtensions
     /// Garante que o valor seja menor ou igual a um número especificado.
     /// </summary>
     /// <param name="value">Valor máximo permitido.</param>
-    public static RuleBuilder<TInstance, int> LessThanOrEqual<TInstance>(this RuleBuilder<TInstance, int> builder, int value) => builder.Must(x => x <= value, (x, _) => $"{x} is not less than or equal {value}");
+    public static RuleBuilder<TInstance, int> LessThanOrEqual<TInstance>(this RuleBuilder<TInstance, int> builder, int value) => builder.Must(x => x <= value, (x, _) => $"{x} is not less than or equal to {value}");
 
     /// <summary>
     /// Garante que o valor esteja dentro de um intervalo fechado.

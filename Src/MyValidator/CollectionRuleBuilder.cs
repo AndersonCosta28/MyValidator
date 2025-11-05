@@ -7,10 +7,10 @@ public class CollectionRuleBuilder<TInstance, TProperty>
     private ValidationRule<TInstance, IEnumerable<TProperty>> _currentRule;
     private readonly List<IValidationRule<TInstance>> _internalRules = [];
 
-
     internal CollectionRuleBuilder(Expression<Func<TInstance, IEnumerable<TProperty>>> collectionSelector, List<IValidationRule<TInstance>> rules)
     {
         this._collectionSelector = collectionSelector;
+        this._currentRule = null!;
         this._rules = rules;
     }
 

@@ -1,5 +1,4 @@
-﻿using Mert1s.MyValidator;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 namespace Mert1s.MyValidator.AspNetCore;
 
@@ -13,7 +12,7 @@ public class MyEditFormValidator : ComponentBase
 
     protected override void OnInitialized()
     {
-        this.configureEditContext(OtherEditForm?.EditContext ?? _currentEditContext);
+        this.configureEditContext(this.OtherEditForm?.EditContext ?? this._currentEditContext);
     }
 
     private void configureEditContext(EditContext editContext)

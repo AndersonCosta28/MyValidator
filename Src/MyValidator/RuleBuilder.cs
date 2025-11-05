@@ -10,6 +10,7 @@ public class RuleBuilder<TInstance, TProperty>
     internal RuleBuilder(Expression<Func<TInstance, TProperty>> propertySelector, List<IValidationRule<TInstance>> rules)
     {
         this._propertySelector = propertySelector;
+        this._currentRule = null!;
         this._rules = rules;
     }
 
@@ -34,6 +35,8 @@ public class RuleBuilder<TInstance, TProperty>
         this._currentRule = new(this._propertySelector, condition);
         this._rules.Add(this._currentRule);
         this._internalRules.Add(this._currentRule);
+        // Set the error message function provided as an expression
+        this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance);
         return this;
     }
 
@@ -42,6 +45,8 @@ public class RuleBuilder<TInstance, TProperty>
         this._currentRule = new(this._propertySelector, condition);
         this._rules.Add(this._currentRule);
         this._internalRules.Add(this._currentRule);
+        // Set the error message function provided as an expression
+        this._currentRule.ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance);
         return this;
     }
 

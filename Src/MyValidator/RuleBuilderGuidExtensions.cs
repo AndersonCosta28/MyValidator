@@ -29,5 +29,5 @@ public static class RuleBuilderGuidExtensions
     /// Garante que o GUID não seja um dos valores proibidos.
     /// </summary>
     /// <param name="disallowedGuids">Lista de GUIDs proibidos.</param>
-    public static RuleBuilder<TInstance, Guid> IsNotOneOf<TInstance>(this RuleBuilder<TInstance, Guid> builder, params Guid[] disallowedGuids) => builder.Must(x => !Array.Exists(disallowedGuids, guid => guid == x), (x, _) => $"{x} is an unallowed value");
+    public static RuleBuilder<TInstance, Guid> IsNotOneOf<TInstance>(this RuleBuilder<TInstance, Guid> builder, params Guid[] disallowedGuids) => builder.Must(x => !Array.Exists(disallowedGuids, guid => guid == x), (x, _) => $"{x} is not an allowed value");
 }

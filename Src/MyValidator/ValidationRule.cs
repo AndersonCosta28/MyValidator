@@ -40,7 +40,10 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     public string GetErrorMessage(TInstance instance)
     {
         var property = this.PropertySelector.Invoke(instance);
-        return this.ErrorMessageFunc.Invoke(property, instance) ?? "Erro de validação.";
+        if (this.ErrorMessageFunc == null)
+            return "Erro de validação.";
+        var msg = this.ErrorMessageFunc.Invoke(property, instance);
+        return msg ?? "Erro de validação.";
     }
 
     public ValidationResult Validate(TInstance instance)
