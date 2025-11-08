@@ -1,4 +1,4 @@
-﻿namespace Mert1s.MyValidator.DependencyInjection.Extensions.DependencyInjection;
+﻿namespace Mert1s.MyValidator.DependencyInjection;
 
 public static class AddMyValidatorExtesions
 {

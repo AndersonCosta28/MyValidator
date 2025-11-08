@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
 
     <!-- Metadados NuGet migrados do .nuspec para o .csproj -->
-    <Version>1.0.4</Version>
-    <PackageId>Mert1s.MyValidator.AspNetCore</PackageId>
+    <Version>1.0.4.1</Version>
+    <PackageId>Mert1s.MyValidator.Components</PackageId>
     <Authors>Anderson Costa</Authors>
     <Owners>Anderson Costa</Owners>
     <Description>ASP.NET Core integrations and components for MyValidator.</Description>
