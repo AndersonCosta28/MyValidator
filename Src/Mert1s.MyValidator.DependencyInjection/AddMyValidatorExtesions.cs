@@ -8,10 +8,12 @@ public static class AddMyValidatorExtesions
         foreach (var assembly in assemblies)
         {
             var types = assembly.GetTypes();
-            var validationTypes = types.Where(isType).ToList();
+            var validationTypes = types.Where(IsType);
 
             foreach (var validationType in validationTypes)
             {
+                if (validationType.BaseType is null)
+                    continue;
                 var typeGeneric = validationType.BaseType.GenericTypeArguments[0];
                 var validationBuilder = typeof(ValidatorBuilder<>).MakeGenericType(typeGeneric);
 
@@ -31,11 +33,14 @@ public static class AddMyValidatorExtesions
         return services;
     }
 
-    private static bool isType(Type type)
+    private static bool IsType(Type type)
     {
         var name = type.FullName;
         var isGenericType = type.IsGenericType;
         if (isGenericType)
+            return false;
+
+        if (!type.BaseType?.IsGenericTypeDefinition ?? true)
             return false;
         try
         {

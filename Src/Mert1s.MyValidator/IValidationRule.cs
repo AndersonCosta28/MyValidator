@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace Mert1s.MyValidator;
+﻿namespace Mert1s.MyValidator;
 
 internal interface IValidationRule<TInstance>
 {
