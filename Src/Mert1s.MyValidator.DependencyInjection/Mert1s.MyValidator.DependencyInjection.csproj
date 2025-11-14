@@ -4,13 +4,14 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.0.4.3</Version>
+    <Version>1.0.4.4</Version>
     <PackageId>Mert1s.MyValidator.DependencyInjection</PackageId>
     <Authors>Anderson Costa</Authors>
     <Owners>Anderson Costa</Owners>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/AndersonCosta28/MyValidator</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/AndersonCosta28/MyValidator/main/icon.png</PackageIconUrl>
+    <PackageIcon Condition="Exists('icon.png')">icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/AndersonCosta28/MyValidator</RepositoryUrl>
     <PackageTags>validation .NET library aspnetcore</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -22,6 +23,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mert1s.MyValidator\Mert1s.MyValidator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include README in package and include icon if present -->
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="icon.png" Pack="true" PackagePath="" Condition="Exists('icon.png')" />
   </ItemGroup>
 
 </Project>
