@@ -28,7 +28,8 @@ public class AsyncIntegrationTests
             using var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT COUNT(1) FROM Users WHERE Email = $email";
             cmd.Parameters.AddWithValue("$email", email);
-            var count = (long)await cmd.ExecuteScalarAsync(ct);
+            var obj = await cmd.ExecuteScalarAsync(ct);
+            var count = obj is long l ? l : Convert.ToInt64(obj ?? 0);
             return count == 0; // valid if not exists
         });
 

@@ -8,6 +8,7 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     public INestedValidator NestedValidator { get; set; } = default!;
 
     public string PathName { get; set; }
+    public CascadeMode? CascadeMode { get; set; }
 
     public ValidationRule(
     Expression<Func<TInstance, TProperty>> propertySelector,

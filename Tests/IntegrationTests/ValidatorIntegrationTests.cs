@@ -28,7 +28,8 @@ public class ValidatorIntegrationTests
             using var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT COUNT(1) FROM Users WHERE Email = $email";
             cmd.Parameters.AddWithValue("$email", e);
-            var count = (long)cmd.ExecuteScalar();
+            var obj = cmd.ExecuteScalar();
+            var count = obj is long l ? l : Convert.ToInt64(obj ?? 0);
             return Task.FromResult(count == 0);
         }));
 
@@ -57,7 +58,8 @@ public class ValidatorIntegrationTests
             using var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT COUNT(1) FROM Users WHERE Email = $email";
             cmd.Parameters.AddWithValue("$email", e);
-            var count = (long)cmd.ExecuteScalar();
+            var obj = cmd.ExecuteScalar();
+            var count = obj is long l ? l : Convert.ToInt64(obj ?? 0);
             return Task.FromResult(count == 0);
         }));
 
@@ -173,7 +175,8 @@ public class ValidatorIntegrationTests
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = "SELECT COUNT(1) FROM Users WHERE Email = $email";
                 cmd.Parameters.AddWithValue("$email", email);
-                var count = (long)await cmd.ExecuteScalarAsync(ct);
+                var obj = await cmd.ExecuteScalarAsync(ct);
+                var count = obj is long l ? l : Convert.ToInt64(obj ?? 0);
                 return count == 0;
             })
             .Message("Email already exists.");

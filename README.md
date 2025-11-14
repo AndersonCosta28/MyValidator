@@ -1,67 +1,52 @@
 # MyValidator
 
 MyValidator is a .NET library designed to simplify and enhance data validation in your applications. It provides a robust and extensible framework for validating user input, ensuring data integrity, and reducing boilerplate code.
+# MyValidator
 
-## Features
+Repositório contendo a solução `MyValidator` e o pacote `Mert1s.MyValidator` — uma biblioteca de validação leve e extensível para .NET.
 
-- **Customizable Rules**: Easily define and apply custom validation rules.
-- **Built-in Validators**: Includes a variety of pre-built validators for common use cases.
-- **Extensibility**: Create your own validation logic by extending the framework.
-- **Error Handling**: Provides detailed error messages for invalid inputs.
-- **Lightweight**: Minimal dependencies and optimized for performance.
+Resumo rápido
+--
+- O pacote principal está em `Src/Mert1s.MyValidator` e fornece builders fluentes para declarar regras de validação (`ValidatorBuilder<T>`, `RuleBuilder`, `CollectionRuleBuilder`).
+- Alvo: `net9.0` (veja `Src/Mert1s.MyValidator/Mert1s.MyValidator.csproj`).
 
-## Installation
+Leia a documentação específica do pacote
+--
+O README detalhado do pacote foi adicionado em `Src/Mert1s.MyValidator/README.md`. Ele traz exemplos de uso, links de build/test e explicações sobre a API. Para abrir o README do pacote, confira:
 
-To install MyValidator, use the NuGet Package Manager:
+- `Src/Mert1s.MyValidator/README.md`
 
-```bash
-dotnet add package MyValidator --source "https://nuget.pkg.github.com/AndersonCosta28/index.json"
+Build e testes
+--
+Para compilar a solução:
+
+```powershell
+dotnet build Mert1s.MyValidator.sln -c Release
 ```
 
-OR
-```bash
-dotnet nuget add source "https://nuget.pkg.github.com/AndersonCosta28/index.json" --name "AndersonCosta28Source"
-dotnet add package MyValidator
+Para executar os testes de unidade:
+
+```powershell
+dotnet test Tests\UnitTests\UnitTests.csproj
 ```
 
-## Usage
+Contribuindo
+--
+- Abra issues para bugs ou sugestões.
+- Envie PRs pequenos e focados; inclua testes sempre que possível.
 
-Here’s a quick example of how to use MyValidator:
+Licença
+--
+Este repositório está sob licença MIT (veja o arquivo `LICENSE` na raiz, se presente).
 
-```csharp
-using MyValidator;
+Contato
+--
+Abra uma issue no GitHub: https://github.com/AndersonCosta28/MyValidator
 
-var validator = new Validator();
-validator.AddRule("Name", value => !string.IsNullOrEmpty(value), "Name cannot be empty");
-validator.AddRule("Age", value => int.TryParse(value, out var age) && age > 18, "Age must be greater than 18");
+---
 
-var result = validator.Validate(new Dictionary<string, string>
-{
-    { "Name", "John" },
-    { "Age", "25" }
-});
+Se quiser, eu posso também:
+- Atualizar o `README.md` raiz com exemplos de uso rápidos extraídos do `Src`.
+- Adicionar um `CHANGELOG.md` básico com histórico de versões.
 
-if (result.IsValid)
-{
-    Console.WriteLine("Validation passed!");
-}
-else
-{
-    foreach (var error in result.Errors)
-    {
-        Console.WriteLine($"{error.Key}: {error.Message}");
-    }
-}
-```
-
-## Contributing
-
-Contributions are welcome! Feel free to open issues or submit pull requests to improve the library.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-## Contact
-
-For questions or feedback, please contact [your-email@example.com].
+Diga qual opção prefere.

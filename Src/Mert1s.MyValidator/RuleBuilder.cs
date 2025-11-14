@@ -6,6 +6,14 @@ public class RuleBuilder<TInstance, TProperty>
     private readonly List<IValidationRule<TInstance>> _rules;
     private readonly List<IValidationRule<TInstance>> _internalRules = [];
     private IValidationRule<TInstance> _currentRule = null!;
+    private CascadeMode? _cascadeMode;
+
+    private void ApplyCascade(IValidationRule<TInstance> rule)
+    {
+        // If a cascade mode was set on this RuleBuilder, store it on the rule (nullable).
+        // If not set, leave rule.CascadeMode as null so the validator default is used.
+        rule.CascadeMode = this._cascadeMode;
+    }
 
     internal RuleBuilder(Expression<Func<TInstance, TProperty>> propertySelector, List<IValidationRule<TInstance>> rules)
     {
@@ -17,6 +25,7 @@ public class RuleBuilder<TInstance, TProperty>
     public RuleBuilder<TInstance, TProperty> Must(Expression<Func<TProperty, bool>> condition)
     {
         var rule = new ValidationRule<TInstance, TProperty>(this._propertySelector, condition);
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -26,6 +35,7 @@ public class RuleBuilder<TInstance, TProperty>
     public RuleBuilder<TInstance, TProperty> Must(Expression<Func<TProperty, TInstance, bool>> condition)
     {
         var rule = new ValidationRule<TInstance, TProperty>(this._propertySelector, condition);
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -38,6 +48,7 @@ public class RuleBuilder<TInstance, TProperty>
         {
             ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance)
         };
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -50,6 +61,7 @@ public class RuleBuilder<TInstance, TProperty>
         {
             ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance)
         };
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -159,6 +171,7 @@ public class RuleBuilder<TInstance, TProperty>
     public RuleBuilder<TInstance, TProperty> SetValidator(ValidatorBuilder<TProperty> validator)
     {
         var rule = new ValidationRule<TInstance, TProperty>(this._propertySelector, validator);
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         return this;
@@ -186,6 +199,7 @@ public class RuleBuilder<TInstance, TProperty>
     public RuleBuilder<TInstance, TProperty> MustAsync(Func<TProperty, CancellationToken, Task<bool>> condition)
     {
         var rule = new AsyncValidationRule<TInstance, TProperty>(this._propertySelector, condition);
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -195,6 +209,7 @@ public class RuleBuilder<TInstance, TProperty>
     public RuleBuilder<TInstance, TProperty> MustAsync(Func<TProperty, TInstance, CancellationToken, Task<bool>> condition)
     {
         var rule = new AsyncValidationRule<TInstance, TProperty>(this._propertySelector, condition);
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -207,6 +222,7 @@ public class RuleBuilder<TInstance, TProperty>
         {
             ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance)
         };
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -219,6 +235,7 @@ public class RuleBuilder<TInstance, TProperty>
         {
             ErrorMessageFunc = (property, instance) => func.Compile().Invoke(property, instance)
         };
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
         this._internalRules.Add(rule);
@@ -229,8 +246,15 @@ public class RuleBuilder<TInstance, TProperty>
     {
         // Nested validator already supports async ValidateAsync, so we can reuse ValidationRule for nested scenarios.
         var rule = new ValidationRule<TInstance, TProperty>(this._propertySelector, validator);
+        this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
+        return this;
+    }
+
+    public RuleBuilder<TInstance, TProperty> SetCascadeMode(CascadeMode mode)
+    {
+        this._cascadeMode = mode;
         return this;
     }
 
@@ -242,6 +266,7 @@ public class RuleBuilder<TInstance, TProperty>
         public Func<TProp, TInst, string> ErrorMessageFunc { get; set; } = default!;
         public INestedValidator NestedValidator { get; set; } = default!;
         public string PathName { get; }
+        public CascadeMode? CascadeMode { get; set; }
 
         public AsyncValidationRule(Expression<Func<TInst, TProp>> propertySelector, Expression<Func<TProp, CancellationToken, Task<bool>>> conditionAsync)
         {
