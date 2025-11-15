@@ -55,4 +55,6 @@ public static class RuleBuilderIntExtensions
     /// Garante que o valor seja ímpar.
     /// </summary>
     public static RuleBuilder<TInstance, int> IsOdd<TInstance>(this RuleBuilder<TInstance, int> builder) => builder.Must(x => x % 2 != 0, (x, _) => $"{x} is not odd");
+
+    public static RuleBuilder<TInstance, int> IsEqual<TInstance>(this RuleBuilder<TInstance, int> builder, int value) => builder.Must(x => x == value, (x, _) => $"{x} is not equal to {value}");
 }

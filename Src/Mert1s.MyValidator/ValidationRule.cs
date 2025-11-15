@@ -9,6 +9,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
 
     public string PathName { get; set; }
     public CascadeMode? CascadeMode { get; set; }
+    public Func<TInstance, bool>? When { get; set; }
+    public Func<TInstance, CancellationToken, Task<bool>>? WhenAsync { get; set; }
 
     public ValidationRule(
     Expression<Func<TInstance, TProperty>> propertySelector,
@@ -53,6 +55,17 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
 
         var value = this.PropertySelector(instance);
 
+        // Check conditional predicates (When / WhenAsync)
+        if (this.When != null && !this.When(instance))
+            return result;
+
+        if (this.WhenAsync != null)
+        {
+            var shouldRun = this.WhenAsync.Invoke(instance, CancellationToken.None).GetAwaiter().GetResult();
+            if (!shouldRun)
+                return result;
+        }
+
         if (!this.Condition(value, instance))
             result.AddError(this.PathName, this.GetErrorMessage(instance));
 
@@ -68,6 +81,16 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         var result = new ValidationResult();
 
         var value = this.PropertySelector(instance);
+
+        if (this.When != null && !this.When(instance))
+            return result;
+
+        if (this.WhenAsync != null)
+        {
+            var shouldRun = await this.WhenAsync.Invoke(instance, cancellation).ConfigureAwait(false);
+            if (!shouldRun)
+                return result;
+        }
 
         if (!this.Condition(value, instance))
             result.AddError(this.PathName, this.GetErrorMessage(instance));

@@ -255,8 +255,42 @@ public class RuleBuilder<TInstance, TProperty>
     public RuleBuilder<TInstance, TProperty> SetCascadeMode(CascadeMode mode)
     {
         this._cascadeMode = mode;
+
+        // If rules were already created on this builder, apply the cascade mode to them as well.
+        foreach (var r in this._internalRules)
+        {
+            r.CascadeMode = mode;
+        }
+
         return this;
     }
+
+    public RuleBuilder<TInstance, TProperty> When(Func<TInstance, bool> predicate)
+    {
+        if (predicate is null) throw new ArgumentNullException(nameof(predicate));
+
+        foreach (var rule in this._internalRules)
+        {
+            rule.When = predicate;
+        }
+
+        return this;
+    }
+
+    public RuleBuilder<TInstance, TProperty> When(Func<TInstance, CancellationToken, Task<bool>> predicateAsync)
+    {
+        if (predicateAsync is null) throw new ArgumentNullException(nameof(predicateAsync));
+
+        foreach (var rule in this._internalRules)
+        {
+            rule.WhenAsync = predicateAsync;
+        }
+
+        return this;
+    }
+
+    public RuleBuilder<TInstance, TProperty> When(Func<TInstance, Task<bool>> predicateAsync) =>
+        When((t, ct) => predicateAsync(t));
 
     private sealed class AsyncValidationRule<TInst, TProp> : IValidationRule<TInst>
     {
@@ -267,6 +301,8 @@ public class RuleBuilder<TInstance, TProperty>
         public INestedValidator NestedValidator { get; set; } = default!;
         public string PathName { get; }
         public CascadeMode? CascadeMode { get; set; }
+        public Func<TInst, bool>? When { get; set; }
+        public Func<TInst, CancellationToken, Task<bool>>? WhenAsync { get; set; }
 
         public AsyncValidationRule(Expression<Func<TInst, TProp>> propertySelector, Expression<Func<TProp, CancellationToken, Task<bool>>> conditionAsync)
         {
@@ -311,6 +347,16 @@ public class RuleBuilder<TInstance, TProperty>
         {
             var result = new ValidationResult();
             var value = this._propertySelector(instance);
+            // Check When / WhenAsync predicates
+            if (this.When != null && !this.When(instance))
+                return result;
+
+            if (this.WhenAsync != null)
+            {
+                var shouldRun = this.WhenAsync.Invoke(instance, CancellationToken.None).GetAwaiter().GetResult();
+                if (!shouldRun)
+                    return result;
+            }
 
             var ok = true;
             if (this._conditionAsync != null)
@@ -348,6 +394,15 @@ public class RuleBuilder<TInstance, TProperty>
         {
             var result = new ValidationResult();
             var value = this._propertySelector(instance);
+            if (this.When != null && !this.When(instance))
+                return result;
+
+            if (this.WhenAsync != null)
+            {
+                var shouldRun = await this.WhenAsync.Invoke(instance, cancellation).ConfigureAwait(false);
+                if (!shouldRun)
+                    return result;
+            }
 
             var ok = true;
             if (this._conditionAsync != null)

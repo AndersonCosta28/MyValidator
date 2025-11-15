@@ -155,6 +155,116 @@ this.RuleFor(x => x.SomeValue).MustAsync(async (value, ct) =>
 });
 ```
 
+Conditional rules (When / WhenAsync)
+--
+
+You can apply rules conditionally in two styles: by grouping rules inside a `When` action on the `ValidatorBuilder`, or by chaining `When` directly on the `RuleBuilder` returned by `RuleFor(...)`.
+
+1) Grouped `When` (action) — useful to add many rules for a specific condition:
+
+```csharp
+public class AgeByCountryValidator : ValidatorBuilder<Person>
+{
+    public AgeByCountryValidator()
+    {
+        this.When(x => x.Country == "BR", () =>
+        {
+            this.RuleFor(x => x.Age).GreaterThanOrEqual(18);
+        });
+
+        this.When(x => x.Country == "US", () =>
+        {
+            this.RuleFor(x => x.Age).GreaterThanOrEqual(21);
+        });
+    }
+}
+```
+
+2) Chained `When` on `RuleBuilder` — applies the predicate only to the rules defined for that property:
+
+```csharp
+this.RuleFor(x => x.Age)
+    .GreaterThanOrEqual(18)
+    .When(x => x.Country == "BR");
+
+this.RuleFor(x => x.Age)
+    .GreaterThanOrEqual(21)
+    .When(x => x.Country == "US");
+```
+
+3) Asynchronous predicates (`WhenAsync`) — both styles support async predicates when your condition requires I/O or async checks:
+
+```csharp
+// Grouped async predicate
+this.WhenAsync(async (x, ct) => await IsCountrySupportedAsync(x.Country, ct), () =>
+{
+    this.RuleFor(x => x.Age).GreaterThanOrEqual(18);
+});
+
+// Chained async predicate on RuleBuilder
+this.RuleFor(x => x.Age)
+    .GreaterThanOrEqual(18)
+    .When(async x => await IsCountrySupportedAsync(x.Country));
+```
+
+Notes
+--
+- `When` (grouped) wraps newly added rules and evaluates the predicate per-instance at validation time.
+- `When` on `RuleBuilder` sets a predicate on the rules created by that builder only.
+- `WhenAsync` executes asynchronously on the `ValidateAsync` path; the synchronous `Validate` path will execute the async predicate in a blocking manner for compatibility.
+
+When + SetCascadeMode (examples from tests)
+--
+
+You can combine `When` with `SetCascadeMode` to control cascade behavior for rules added inside a grouped `When`, or for a `RuleBuilder`-scoped `When`.
+
+Grouped `When` + `SetCascadeMode` (applies cascade to all rules added in the block):
+
+```csharp
+public class GroupedCascadeValidator : ValidatorBuilder<Person>
+{
+    public GroupedCascadeValidator()
+    {
+        this.When(x => x.Country == "BR", () =>
+        {
+            this.RuleFor(x => x.Age)
+                .Must(v => false).Message("A")
+                .Must(v => false).Message("B");
+        }).SetCascadeMode(CascadeMode.Stop);
+    }
+}
+
+// The above will stop after the first failing rule for the property when the predicate is true.
+```
+
+Chained `When` on `RuleBuilder` + `SetCascadeMode` (applies cascade only to that property builder):
+
+```csharp
+this.RuleFor(x => x.Age)
+    .Must(v => false).Message("A")
+    .Must(v => false).Message("B")
+    .When(x => x.Country == "BR")
+    .SetCascadeMode(CascadeMode.Stop);
+```
+
+WhenAsync with cancellation
+--
+
+If your predicate requires async work, use `WhenAsync`. The `ValidateAsync` path will observe cancellation tokens; if the predicate is canceled the task will be canceled:
+
+```csharp
+this.WhenAsync(async (x, ct) =>
+{
+    await SomeIoOperationAsync(x, ct).ConfigureAwait(false);
+    return true;
+}, () =>
+{
+    this.RuleFor(x => x.Age).GreaterThanOrEqual(18);
+});
+
+// Calling ValidateAsync with a cancelled CancellationToken will result in a canceled task.
+```
+
 Reading results
 --
 `ValidatorBuilder<T>.Validate` returns `List<ValidationResult>`. Each `ValidationResult` contains the `Errors` collection with `ValidationError` objects which include `Path` and `Message`.
