@@ -35,17 +35,23 @@ public static class AddMyValidatorExtesions
 
     private static bool IsType(Type type)
     {
-        var name = type.FullName;
-        var isGenericType = type.IsGenericType;
-        if (isGenericType)
+        var baseType = type.BaseType;
+
+        if (baseType is null)
             return false;
 
-        if (!type.BaseType?.IsGenericTypeDefinition ?? true)
+        if (!baseType.IsGenericType)
             return false;
+
         try
         {
-            var isGenericTypeDefinition = type.BaseType is not null && type.BaseType?.GetGenericTypeDefinition() == typeof(ValidatorBuilder<>);
-            return !isGenericType && isGenericTypeDefinition && !type.IsAbstract;
+            if (baseType.GetGenericTypeDefinition() != typeof(ValidatorBuilder<>))
+                return false;
+
+            if (type.IsAbstract)
+                return false;
+
+            return true;
         }
         catch (Exception ex)
         {

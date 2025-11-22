@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <!-- Metadados NuGet migrados do .nuspec para o .csproj -->
-    <Version>1.0.5</Version>
+    <Version>1.0.5.1</Version>
     <PackageId>Mert1s.MyValidator.Components</PackageId>
     <Authors>Anderson Costa</Authors>
     <Owners>Anderson Costa</Owners>

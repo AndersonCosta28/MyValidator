@@ -143,11 +143,20 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     {
         ArgumentNullException.ThrowIfNull(expression);
 
+        // Typical case: member access like x => x.Prop
         if (expression.Body is MemberExpression memberExpression)
             return memberExpression.Member.Name;
 
+        // Handle conversions / casts where the operand is a member access: x => (SomeType)x.Prop
         if (expression.Body is UnaryExpression unaryExpression && unaryExpression.Operand is MemberExpression operand)
             return operand.Member.Name;
+
+        // If the expression targets the whole instance (x => x) or a cast of the parameter (x => (T)x), return empty path
+        if (expression.Body is ParameterExpression)
+            return string.Empty;
+
+        if (expression.Body is UnaryExpression unary && unary.Operand is ParameterExpression)
+            return string.Empty;
 
         throw new ArgumentException("A expressão fornecida não é válida.", nameof(expression));
     }
