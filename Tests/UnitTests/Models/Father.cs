@@ -1,5 +1,5 @@
 internal class Father : Person
 {
-    public required Person Wife { get; set; }
-    public required List<Person> Children { get; set; }
+    public Person Wife { get; set; }
+    public List<Person> Children { get; set; }
 }

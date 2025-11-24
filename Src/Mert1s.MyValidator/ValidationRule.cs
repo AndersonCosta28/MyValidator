@@ -1,4 +1,6 @@
-﻿namespace Mert1s.MyValidator;
+﻿using System.Collections;
+
+namespace Mert1s.MyValidator;
 
 internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TInstance>
 {
@@ -29,9 +31,32 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     {
         this.PathName = GetPropertyName(propertySelector);
         this.PropertySelector = propertySelector.Compile();
-
         var conditionCompiled = condition.Compile();
-        this.Condition = (property, instance) => conditionCompiled(property);
+        this.Condition = (property, instance) =>
+        {
+            try
+            {
+                return conditionCompiled(property);
+            }
+            catch (OperationCanceledException)
+            {
+                // Preserve cancellation
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Log diagnostic information to aid debugging
+                try
+                {
+                    var propValue = property == null ? "<null>" : property?.ToString() ?? "<unprintable>";
+                    Console.WriteLine($"[MyValidator][Condition Exception] Path='{this.PathName}' PropertyValue='{propValue}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+                }
+                catch { /* swallow any logging exceptions */ }
+
+                // On exception, treat the condition as failed
+                return false;
+            }
+        };
     }
 
     public ValidationRule(
@@ -56,22 +81,90 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         var value = this.PropertySelector(instance);
 
         // Check conditional predicates (When / WhenAsync)
-        if (this.When != null && !this.When(instance))
-            return result;
+        if (this.When != null)
+        {
+            bool whenResult = false;
+            try
+            {
+                whenResult = this.When(instance);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MyValidator][When Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+                // If When throws, skip the rule
+                whenResult = false;
+            }
+
+            if (!whenResult)
+                return result;
+        }
 
         if (this.WhenAsync != null)
         {
-            var shouldRun = this.WhenAsync.Invoke(instance, CancellationToken.None).GetAwaiter().GetResult();
+            var shouldRun = false;
+            try
+            {
+                shouldRun = this.WhenAsync.Invoke(instance, CancellationToken.None).GetAwaiter().GetResult();
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MyValidator][WhenAsync Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+                shouldRun = false;
+            }
+
             if (!shouldRun)
                 return result;
         }
 
-        if (!this.Condition(value, instance))
+        bool conditionOk = false;
+        try
+        {
+            // Log property before evaluating condition for tracing
+            try
+            {
+                var propStr = value == null ? "<null>" : value?.ToString() ?? "<unprintable>";
+                Console.WriteLine($"[MyValidator][Condition Evaluate] Path='{this.PathName}' PropertyValue='{propStr}'");
+            }
+            catch { }
+
+            conditionOk = this.Condition(value, instance);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[MyValidator][Condition Threw] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+            conditionOk = false;
+        }
+
+        if (!conditionOk)
             result.AddError(this.PathName, this.GetErrorMessage(instance));
 
         if (this.NestedValidator != null && value != null)
-            this.ValidateNested(value, result);
-
+        {
+            try
+            {
+                this.ValidateNested(value, result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MyValidator][Nested Validate Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+            }
+        }
 
         return result;
     }
@@ -82,28 +175,95 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
 
         var value = this.PropertySelector(instance);
 
-        if (this.When != null && !this.When(instance))
-            return result;
+        if (this.When != null)
+        {
+            bool whenResult = false;
+            try
+            {
+                whenResult = this.When(instance);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MyValidator][When Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+                whenResult = false;
+            }
+
+            if (!whenResult)
+                return result;
+        }
 
         if (this.WhenAsync != null)
         {
-            var shouldRun = await this.WhenAsync.Invoke(instance, cancellation).ConfigureAwait(false);
+            var shouldRun = false;
+            try
+            {
+                shouldRun = await this.WhenAsync.Invoke(instance, cancellation).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MyValidator][WhenAsync Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+                shouldRun = false;
+            }
+
             if (!shouldRun)
                 return result;
         }
 
-        if (!this.Condition(value, instance))
+        bool conditionOk = false;
+        try
+        {
+            try
+            {
+                var propStr = value == null ? "<null>" : value?.ToString() ?? "<unprintable>";
+                Console.WriteLine($"[MyValidator][Condition Evaluate Async] Path='{this.PathName}' PropertyValue='{propStr}'");
+            }
+            catch { }
+
+            conditionOk = this.Condition(value, instance);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[MyValidator][Condition Threw Async] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+            conditionOk = false;
+        }
+
+        if (!conditionOk)
             result.AddError(this.PathName, this.GetErrorMessage(instance));
 
         if (this.NestedValidator != null && value != null)
-            await this.ValidateNestedAsync(value, result, cancellation).ConfigureAwait(false);
+        {
+            try
+            {
+                await this.ValidateNestedAsync(value, result, cancellation).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[MyValidator][Nested Validate Async Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
+            }
+        }
 
         return result;
     }
 
     private void ValidateNested(object value, ValidationResult result)
     {
-        if (value is IEnumerable<object> list)
+        if (value is System.Collections.IEnumerable list)
         {
             var i = 0;
             foreach (var item in list)
@@ -122,7 +282,7 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
 
     private async Task ValidateNestedAsync(object value, ValidationResult result, CancellationToken cancellation)
     {
-        if (value is IEnumerable<object> list)
+        if (value is System.Collections.IEnumerable list)
         {
             var i = 0;
             foreach (var item in list)

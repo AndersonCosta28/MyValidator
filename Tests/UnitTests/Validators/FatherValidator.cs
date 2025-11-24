@@ -4,7 +4,9 @@
     {
         var ruleForWife = this.RuleFor(x => x.Wife);
 
-        ruleForWife.SetValidator(new WifeValidator());
+        ruleForWife
+            .NotNull()
+            .SetValidator(new WifeValidator());
 
         this.RulesFor(x => x.Children)
             .Must(x => x.All(y => y.Gender == Gender.Feminino))

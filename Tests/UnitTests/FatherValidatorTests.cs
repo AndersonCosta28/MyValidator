@@ -78,4 +78,51 @@ public class FatherValidatorTests
         // Assert
         Assert.Contains(result.SelectMany(r => r.Errors), e => e.Message == "All children must be female.");
     }
+
+    [Fact]
+    public void Should_ReturnError_WhenWifeIsNull()
+    {
+        // Arrange
+        var father = new Father
+        {
+            Name = "Carlos",
+            DateOfBirth = new DateTime(1980, 1, 1),
+            Gender = Gender.Masculino,
+            Wife = null!,
+            Children = new List<Person>()
+        };
+
+        var validator = new FatherValidator();
+
+        // Act
+        var result = validator.Validate(father);
+
+        // Assert - NotNull extension produces a message containing "is null"
+        Assert.Contains(result.SelectMany(r => r.Errors), e => e.Message.Contains("is null"));
+    }
+
+    [Fact]
+    public void Should_Pass_WhenAllValid()
+    {
+        // Arrange
+        var father = new Father
+        {
+            Name = "Carlos",
+            DateOfBirth = new DateTime(1980, 1, 1),
+            Gender = Gender.Masculino,
+            Wife = new Person { Name = "Ana" },
+            Children =
+        [
+            new Person { Name = "Maria", DateOfBirth = DateTime.Today.AddYears(-5), Gender = Gender.Feminino }
+        ]
+        };
+
+        var validator = new FatherValidator();
+
+        // Act
+        var result = validator.Validate(father);
+
+        // Assert - no errors
+        Assert.All(result, r => Assert.True(r.IsValid));
+    }
 }
