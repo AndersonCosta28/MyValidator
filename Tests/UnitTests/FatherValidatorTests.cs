@@ -1,3 +1,5 @@
+using UnitTests.Models;
+
 namespace UnitTests;
 
 public class FatherValidatorTests

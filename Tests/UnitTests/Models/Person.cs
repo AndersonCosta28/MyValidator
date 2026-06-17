@@ -1,11 +1,8 @@
-﻿internal enum Gender
-{
-    Masculino, Feminino
-}
+﻿namespace UnitTests.Models;
 
 internal class Person
 {
-    public required string Name { get; set; }
-    public DateTime DateOfBirth { get; set; }
-    public Gender Gender { get; set; }
+    public string? Name { get; set; } = default!;
+    public DateTime? DateOfBirth { get; set; } = default!;
+    public Gender? Gender { get; set; } = default!;
 }

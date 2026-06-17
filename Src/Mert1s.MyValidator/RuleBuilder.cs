@@ -168,9 +168,56 @@ public class RuleBuilder<TInstance, TProperty>
         return this;
     }
 
+    public RuleBuilder<TInstance, TProperty> MessageAsync(Func<TProperty, TInstance, CancellationToken, Task<string>> func)
+    {
+        foreach (var rule in this._internalRules.AsEnumerable().Reverse())
+        {
+            if (rule is ValidationRule<TInstance, TProperty> validationRule && validationRule.ErrorMessageFuncAsync == null)
+            {
+                validationRule.ErrorMessageFuncAsync = func;
+                break;
+            }
+            if (rule is AsyncValidationRule<TInstance, TProperty> asyncRule && asyncRule.ErrorMessageFuncAsync == null)
+            {
+                asyncRule.ErrorMessageFuncAsync = func;
+                break;
+            }
+        }
+
+        if (this._currentRule is ValidationRule<TInstance, TProperty> vr)
+            vr.ErrorMessageFuncAsync = func;
+        else if (this._currentRule is AsyncValidationRule<TInstance, TProperty> ar)
+            ar.ErrorMessageFuncAsync = func;
+
+        return this;
+    }
+
+    public RuleBuilder<TInstance, TProperty> MessageAsync(Func<TProperty, CancellationToken, Task<string>> func) =>
+        MessageAsync((prop, _, ct) => func(prop, ct));
+
+    public RuleBuilder<TInstance, TProperty> MessageAsync(Func<CancellationToken, Task<string>> func) =>
+        MessageAsync((_, _, ct) => func(ct));
+
+    public RuleBuilder<TInstance, TProperty> MessageAsync(Func<TProperty, TInstance, Task<string>> func) =>
+        MessageAsync((prop, inst, _) => func(prop, inst));
+
+    public RuleBuilder<TInstance, TProperty> MessageAsync(Func<TProperty, Task<string>> func) =>
+        MessageAsync((prop, _, _) => func(prop));
+
     public RuleBuilder<TInstance, TProperty> SetValidator(ValidatorBuilder<TProperty> validator)
     {
         var rule = new ValidationRule<TInstance, TProperty>(this._propertySelector, validator);
+        this.ApplyCascade(rule);
+        this._currentRule = rule;
+        this._rules.Add(rule);
+        return this;
+    }
+
+    // New generic overload that accepts a validator for any nested type.
+    public RuleBuilder<TInstance, TProperty> SetValidator<TNested>(ValidatorBuilder<TNested> validator)
+    {
+        // Use the INestedValidator-based constructor to avoid type variance issues with nullable reference types.
+        var rule = new ValidationRule<TInstance, TProperty>(this._propertySelector, (INestedValidator)validator);
         this.ApplyCascade(rule);
         this._currentRule = rule;
         this._rules.Add(rule);
@@ -252,6 +299,16 @@ public class RuleBuilder<TInstance, TProperty>
         return this;
     }
 
+    // Generic overload for async nested validators
+    public RuleBuilder<TInstance, TProperty> SetValidatorAsync<TNested>(ValidatorBuilder<TNested> validator)
+    {
+        var rule = new ValidationRule<TInstance, TProperty>(this._propertySelector, (INestedValidator)validator);
+        this.ApplyCascade(rule);
+        this._currentRule = rule;
+        this._rules.Add(rule);
+        return this;
+    }
+
     public RuleBuilder<TInstance, TProperty> SetCascadeMode(CascadeMode mode)
     {
         this._cascadeMode = mode;
@@ -277,7 +334,7 @@ public class RuleBuilder<TInstance, TProperty>
         return this;
     }
 
-    public RuleBuilder<TInstance, TProperty> When(Func<TInstance, CancellationToken, Task<bool>> predicateAsync)
+    public RuleBuilder<TInstance, TProperty> WhenAsync(Func<TInstance, CancellationToken, Task<bool>> predicateAsync)
     {
         if (predicateAsync is null) throw new ArgumentNullException(nameof(predicateAsync));
 
@@ -289,8 +346,8 @@ public class RuleBuilder<TInstance, TProperty>
         return this;
     }
 
-    public RuleBuilder<TInstance, TProperty> When(Func<TInstance, Task<bool>> predicateAsync) =>
-        When((t, ct) => predicateAsync(t));
+    public RuleBuilder<TInstance, TProperty> WhenAsync(Func<TInstance, Task<bool>> predicateAsync) =>
+        WhenAsync((t, ct) => predicateAsync(t));
 
     private sealed class AsyncValidationRule<TInst, TProp> : IValidationRule<TInst>
     {
@@ -298,6 +355,7 @@ public class RuleBuilder<TInstance, TProperty>
         private readonly Func<TProp, TInst, CancellationToken, Task<bool>>? _conditionAsync;
 
         public Func<TProp, TInst, string> ErrorMessageFunc { get; set; } = default!;
+        public Func<TProp, TInst, CancellationToken, Task<string>>? ErrorMessageFuncAsync { get; set; }
         public INestedValidator NestedValidator { get; set; } = default!;
         public string PathName { get; }
         public CascadeMode? CascadeMode { get; set; }
@@ -341,6 +399,17 @@ public class RuleBuilder<TInstance, TProperty>
                 return "Erro de validação.";
             var msg = this.ErrorMessageFunc.Invoke(property, instance);
             return msg ?? "Erro de validação.";
+        }
+
+        public async Task<string> GetErrorMessageAsync(TInst instance, CancellationToken cancellation = default)
+        {
+            if (this.ErrorMessageFuncAsync != null)
+            {
+                var property = this._propertySelector(instance);
+                var msg = await this.ErrorMessageFuncAsync.Invoke(property, instance, cancellation).ConfigureAwait(false);
+                return msg ?? "Erro de validação.";
+            }
+            return this.GetErrorMessage(instance);
         }
 
         public ValidationResult Validate(TInst instance)
@@ -409,7 +478,7 @@ public class RuleBuilder<TInstance, TProperty>
                 ok = await this._conditionAsync.Invoke(value, instance, cancellation).ConfigureAwait(false);
 
             if (!ok)
-                result.AddError(this.PathName, this.GetErrorMessage(instance));
+                result.AddError(this.PathName, await this.GetErrorMessageAsync(instance, cancellation).ConfigureAwait(false));
 
             if (this.NestedValidator != null && value != null)
             {

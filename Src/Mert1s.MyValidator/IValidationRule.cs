@@ -12,6 +12,7 @@ internal interface IValidationRule<TInstance>
     Func<TInstance, CancellationToken, Task<bool>>? WhenAsync { get; set; }
 
     string GetErrorMessage(TInstance instance);
+    Task<string> GetErrorMessageAsync(TInstance instance, CancellationToken cancellation = default);
     ValidationResult Validate(TInstance instance);
     Task<ValidationResult> ValidateAsync(TInstance instance, CancellationToken cancellation = default);
 }

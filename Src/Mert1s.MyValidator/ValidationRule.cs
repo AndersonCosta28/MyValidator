@@ -7,6 +7,7 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
     public Func<TInstance, TProperty> PropertySelector { get; } = default!;
     public Func<TProperty, TInstance, bool> Condition { get; } = default!;
     public Func<TProperty, TInstance, string> ErrorMessageFunc { get; set; } = default!;
+    public Func<TProperty, TInstance, CancellationToken, Task<string>>? ErrorMessageFuncAsync { get; set; }
     public INestedValidator NestedValidator { get; set; } = default!;
 
     public string PathName { get; set; }
@@ -72,6 +73,17 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             return "Erro de validação.";
         var msg = this.ErrorMessageFunc.Invoke(property, instance);
         return msg ?? "Erro de validação.";
+    }
+
+    public async Task<string> GetErrorMessageAsync(TInstance instance, CancellationToken cancellation = default)
+    {
+        if (this.ErrorMessageFuncAsync != null)
+        {
+            var property = this.PropertySelector.Invoke(instance);
+            var msg = await this.ErrorMessageFuncAsync.Invoke(property, instance, cancellation).ConfigureAwait(false);
+            return msg ?? "Erro de validação.";
+        }
+        return this.GetErrorMessage(instance);
     }
 
     public ValidationResult Validate(TInstance instance)
@@ -240,7 +252,7 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         }
 
         if (!conditionOk)
-            result.AddError(this.PathName, this.GetErrorMessage(instance));
+            result.AddError(this.PathName, await this.GetErrorMessageAsync(instance, cancellation).ConfigureAwait(false));
 
         if (this.NestedValidator != null && value != null)
         {

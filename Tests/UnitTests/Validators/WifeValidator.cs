@@ -1,3 +1,5 @@
+using UnitTests.Models;
+
 internal class WifeValidator : ValidatorBuilder<Person>
 {
     public WifeValidator() =>

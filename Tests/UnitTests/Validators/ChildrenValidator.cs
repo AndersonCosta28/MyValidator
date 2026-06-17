@@ -1,3 +1,5 @@
+using UnitTests.Models;
+
 internal class ChildrenValidator : ValidatorBuilder<Person>
 {
     public ChildrenValidator() =>

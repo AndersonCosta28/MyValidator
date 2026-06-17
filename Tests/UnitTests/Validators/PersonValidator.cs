@@ -1,3 +1,5 @@
+using UnitTests.Models;
+
 internal class PersonValidator : ValidatorBuilder<Person>
 {
     public PersonValidator() =>

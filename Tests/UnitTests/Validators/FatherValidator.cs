@@ -1,10 +1,10 @@
-﻿internal class FatherValidator : ValidatorBuilder<Father>
+﻿using UnitTests.Models;
+
+internal class FatherValidator : ValidatorBuilder<Father>
 {
     public FatherValidator()
     {
-        var ruleForWife = this.RuleFor(x => x.Wife);
-
-        ruleForWife
+        this.RuleFor(x => x.Wife)
             .NotNull()
             .SetValidator(new WifeValidator());
 

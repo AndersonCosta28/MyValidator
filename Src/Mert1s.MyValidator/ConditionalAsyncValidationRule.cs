@@ -32,6 +32,7 @@ internal sealed class ConditionalAsyncValidationRule<TInstance> : IValidationRul
     }
 
     public string GetErrorMessage(TInstance instance) => _inner.GetErrorMessage(instance);
+    public Task<string> GetErrorMessageAsync(TInstance instance, CancellationToken cancellation = default) => _inner.GetErrorMessageAsync(instance, cancellation);
 
     public ValidationResult Validate(TInstance instance)
     {

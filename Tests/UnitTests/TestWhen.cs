@@ -149,7 +149,7 @@ public class ConditionalValidationTests
         {
             this.RuleFor(x => x.IdadeDeMaioridade)
                 .GreaterThanOrEqual(18)
-                .When(async m => await Task.FromResult(m.Pais == "Brasil"));
+                .WhenAsync(async m => await Task.FromResult(m.Pais == "Brasil"));
         }
     }
 

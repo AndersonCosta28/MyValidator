@@ -90,7 +90,7 @@ public class WhenAdvancedTests
         {
             this.RuleFor(x => x.Idade)
                 .GreaterThanOrEqual(18)
-                .When(async m => await Task.FromResult(m.Pais == "Brasil"));
+                .WhenAsync(async m => await Task.FromResult(m.Pais == "Brasil"));
         }
     }
 }

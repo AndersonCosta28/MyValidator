@@ -144,6 +144,6 @@ public class AdditionalExtensionsTests
 
     private class TestValidatorNotNullNotnullConstraint : ValidatorBuilder<ModelWithNonNullString>
     {
-        public TestValidatorNotNullNotnullConstraint() => this.RuleFor(x => x.Name).NotNull_NotNullConstraint();
+        public TestValidatorNotNullNotnullConstraint() => this.RuleFor(x => x.Name).NotNull();
     }
 }
