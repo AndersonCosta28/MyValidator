@@ -160,7 +160,7 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         }
 
         if (!conditionOk)
-            result.AddError(this.PathName, this.GetErrorMessage(instance));
+            result.AddError(this.PathName, this.GetErrorMessageAsync(instance, CancellationToken.None).GetAwaiter().GetResult());
 
         if (this.NestedValidator != null && value != null)
         {

@@ -196,6 +196,6 @@ public class ValidatorIntegrationTests
     private class ParentValidator : ValidatorBuilder<ParentModel>
     {
         public ParentValidator(ValidatorBuilder<ChildModel> childValidator) => this.RuleFor(x => x.Child)
-            .SetValidatorAsync(childValidator);
+            .SetValidator(childValidator);
     }
 }
