@@ -44,16 +44,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
                 // Preserve cancellation
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Log diagnostic information to aid debugging
-                try
-                {
-                    var propValue = property == null ? "<null>" : property?.ToString() ?? "<unprintable>";
-                    Console.WriteLine($"[MyValidator][Condition Exception] Path='{this.PathName}' PropertyValue='{propValue}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
-                }
-                catch { /* swallow any logging exceptions */ }
-
                 // On exception, treat the condition as failed
                 return false;
             }
@@ -104,9 +96,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"[MyValidator][When Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
                 // If When throws, skip the rule
                 whenResult = false;
             }
@@ -126,9 +117,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"[MyValidator][WhenAsync Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
                 shouldRun = false;
             }
 
@@ -139,23 +129,14 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         bool conditionOk = false;
         try
         {
-            // Log property before evaluating condition for tracing
-            try
-            {
-                var propStr = value == null ? "<null>" : value?.ToString() ?? "<unprintable>";
-                Console.WriteLine($"[MyValidator][Condition Evaluate] Path='{this.PathName}' PropertyValue='{propStr}'");
-            }
-            catch { }
-
             conditionOk = this.Condition(value, instance);
         }
         catch (OperationCanceledException)
         {
             throw;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"[MyValidator][Condition Threw] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
             conditionOk = false;
         }
 
@@ -172,9 +153,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"[MyValidator][Nested Validate Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
             }
         }
 
@@ -198,9 +178,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"[MyValidator][When Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
                 whenResult = false;
             }
 
@@ -219,9 +198,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"[MyValidator][WhenAsync Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
                 shouldRun = false;
             }
 
@@ -232,22 +210,14 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
         bool conditionOk = false;
         try
         {
-            try
-            {
-                var propStr = value == null ? "<null>" : value?.ToString() ?? "<unprintable>";
-                Console.WriteLine($"[MyValidator][Condition Evaluate Async] Path='{this.PathName}' PropertyValue='{propStr}'");
-            }
-            catch { }
-
             conditionOk = this.Condition(value, instance);
         }
         catch (OperationCanceledException)
         {
             throw;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"[MyValidator][Condition Threw Async] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
             conditionOk = false;
         }
 
@@ -264,9 +234,8 @@ internal partial class ValidationRule<TInstance, TProperty> : IValidationRule<TI
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"[MyValidator][Nested Validate Async Exception] Path='{this.PathName}' Exception='{ex.GetType().FullName}: {ex.Message}'\n{ex.StackTrace}");
             }
         }
 

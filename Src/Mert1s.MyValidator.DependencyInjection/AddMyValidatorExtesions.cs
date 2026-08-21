@@ -53,9 +53,8 @@ public static class AddMyValidatorExtesions
 
             return true;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine(ex.Message);
             return false;
         }
     }
