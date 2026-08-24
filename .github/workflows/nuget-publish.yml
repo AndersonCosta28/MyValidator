@@ -1,40 +1,38 @@
 name: Publish NuGet Package
 
+# Publica automaticamente a cada merge na main:
+# calcula o bump semântico dos commits (feat -> minor, fix -> patch, BREAKING -> major),
+# cria a tag vX.Y.Z sozinho e publica a versão estável no GitHub Packages e nuget.org.
 on:
   push:
     branches:
-      - main # Executa o pipeline ao fazer push na branch "main"
+      - main
   pull_request:
     branches:
-      - main # Executa o pipeline em Pull Requests para a branch "main"
+      - main
   workflow_dispatch:
 
 env:
-  DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1 # Define a variável de ambiente para o sistema de globalização do .NET
+  DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       packages: write
-      contents: read
-      
+      contents: write # Para criar e empurrar a tag de release
+      id-token: write # Habilita a emissão do token OIDC do GitHub
+
     steps:
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y curl wget ca-certificates
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0 # Histórico completo para o GitVersion
 
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Install .NET 9
-      run: |
-        wget https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh --no-check-certificate
-        chmod +x dotnet-install.sh
-        ./dotnet-install.sh --channel 9.0 --install-dir $HOME/.dotnet
-        echo "$HOME/.dotnet" >> $GITHUB_PATH
-
-    - name: Print .NET Info
-      run: dotnet --info
+    - name: Setup .NET 9
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '9.0'
 
     - name: Restore dependencies
       run: dotnet restore
@@ -43,19 +41,73 @@ jobs:
       run: dotnet test --verbosity detailed
 
     - name: Build project
-      run: dotnet build --configuration Release
+      run: dotnet build --configuration Release --no-restore
 
-    - name: Pack NuGet package
-      run: dotnet pack --configuration Release --output ./nupkg
+    - name: Compute next version
+      id: version
+      if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      run: |
+        set -euo pipefail
+
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [ -z "$LAST_TAG" ]; then
+          MAJOR=1; MINOR=0; PATCH=0
+          COMMITS=$(git log --format=%B)
+        else
+          MAJOR=$(echo "$LAST_TAG" | cut -d. -f1 | tr -d v)
+          MINOR=$(echo "$LAST_TAG" | cut -d. -f2)
+          PATCH=$(echo "$LAST_TAG" | cut -d. -f3)
+          COMMITS=$(git log --format=%B "$LAST_TAG"..HEAD)
+        fi
+
+        CHANGED=0
+        if echo "$COMMITS" | grep -qiE "BREAKING CHANGE|^[a-z]+\(.*\)!: |^[a-z]+!: "; then
+          MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0; CHANGED=1
+        elif echo "$COMMITS" | grep -qiE "^feat"; then
+          MINOR=$((MINOR+1)); PATCH=0; CHANGED=1
+        elif echo "$COMMITS" | grep -qiE "^fix"; then
+          PATCH=$((PATCH+1)); CHANGED=1
+        fi
+
+        echo "last_tag=$LAST_TAG" >> "$GITHUB_OUTPUT"
+        echo "next_tag=v$MAJOR.$MINOR.$PATCH" >> "$GITHUB_OUTPUT"
+        echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
+        echo "next_tag=v$MAJOR.$MINOR.$PATCH (changed=$CHANGED)"
+
+        if [ "$CHANGED" = "0" ]; then
+          echo "No semantic changes since $LAST_TAG — skipping release."
+        fi
+
+    - name: Create and push release tag
+      if: steps.version.outputs.changed == '1'
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git tag "${{ steps.version.outputs.next_tag }}"
+        git push origin "${{ steps.version.outputs.next_tag }}"
+
+    - name: Pack NuGet packages
+      if: steps.version.outputs.changed == '1'
+      run: dotnet pack --configuration Release --no-build --output ./nupkg
 
     - name: Publish to GitHub Packages
-      if: github.ref == 'refs/heads/main' # Publica apenas na branch "main"
+      if: steps.version.outputs.changed == '1'
       run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/AndersonCosta28/index.json" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+
+    - name: NuGet login (OIDC -> temporary API key)
+      if: steps.version.outputs.changed == '1'
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
+    - name: Publish to nuget.org
+      if: steps.version.outputs.changed == '1'
+      run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
 
     - name: Clean up artifacts
       if: always()
       run: rm -rf ./nupkg
-
 
   # Job para testar localmente
   local-test:

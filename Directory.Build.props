@@ -1,0 +1,17 @@
+<Project>
+
+  <PropertyGroup>
+    <Authors>Anderson Costa</Authors>
+    <Owners>Anderson Costa</Owners>
+    <RepositoryUrl>https://github.com/AndersonCosta28/MyValidator</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/AndersonCosta28/MyValidator</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="6.8.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
