@@ -34,15 +34,6 @@ jobs:
       with:
         dotnet-version: '9.0'
 
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Run Unit Tests
-      run: dotnet test --verbosity detailed
-
-    - name: Build project
-      run: dotnet build --configuration Release --no-restore
-
     - name: Compute next version
       id: version
       if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -85,6 +76,15 @@ jobs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git tag "${{ steps.version.outputs.next_tag }}"
         git push origin "${{ steps.version.outputs.next_tag }}"
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Run Unit Tests
+      run: dotnet test --verbosity detailed
+
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
 
     - name: Pack NuGet packages
       if: steps.version.outputs.changed == '1'
