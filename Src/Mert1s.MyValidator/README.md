@@ -18,11 +18,11 @@ Package info
 --
 - `PackageId`: `Mert1s.MyValidator`
 - `TargetFramework`: `net9.0`
-- `Version` in project: `1.0.4.3`
+- Version calculada automaticamente por commit (GitVersion), publicada no nuget.org e no GitHub Packages.
 
 Installation
 --
-From NuGet (when published):
+From NuGet:
 
 ```powershell
 dotnet add package Mert1s.MyValidator
